@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>◊ FallSeed · Village · Progressive Web App (single HTML file)</title>
+<meta name="description" content="FallSeed Village — a Progressive Web App (PWA) for institution-tier governance. 5 institution presets (Village / Guild / DAO / Housing-Coop / Parish). Multi-actor coordination via signed JSON bundles (Web Crypto Ed25519). Members, charter, proposals, votes, ledger, bundles. Build engine and Fork Seed packager included. Single HTML, IDB primary, sovereign.">
+<meta name="prime" content="1277">
+<meta name="seed-level" content="4">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22FallSeed%20Village%22%2C%20%22short_name%22%3A%20%22FallSeed-VG%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%230b0a0f%22%2C%20%22theme_color%22%3A%20%22%23b8974a%22%2C%20%22description%22%3A%20%22Institution%20governance%20%5Cu00b7%20signed%20bundles%20%5Cu00b7%205%20institution%20presets%20%5Cu00b7%20single%20HTML%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/svg%2Bxml%3Butf8%2C%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20fill%3D%27%25230b0a0f%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2744%27%20text-anchor%3D%27middle%27%20font-size%3D%2740%27%20fill%3D%27%2523b8974a%27%20font-family%3D%27serif%27%20font-weight%3D%27bold%27%3E%5Cu25ca%3C/text%3E%3C/svg%3E%22%2C%20%22sizes%22%3A%20%22any%22%2C%20%22type%22%3A%20%22image/svg%2Bxml%22%7D%5D%7D">
+<style>
+:root{--void:#0b0a0f;--void-2:#13121a;--ink:#1a1922;--line:#2a2934;--line-soft:#1f1e28;--cream:#e6e1d6;--cream-dim:#a8a395;--cream-muted:#6e6a5e;--brass:#b8974a;--amber:#ff8c00;--ox:#8b1a1a;--green:#4ade80;--red:#ef4444;--blue:#60a5fa;--yellow:#fbbf24;--violet:#a855f7;--serif:Georgia,'Libre Baskerville',ui-serif,serif;--sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:'IBM Plex Mono','SF Mono',ui-monospace,Menlo,monospace}
+*{margin:0;padding:0;box-sizing:border-box}html,body{background:var(--void);color:var(--cream);font:14px/1.55 var(--sans);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;background:transparent;border:none;color:inherit}
+input,textarea,select{font-family:inherit;background:var(--ink);border:1px solid var(--line);color:var(--cream);border-radius:3px;padding:8px 11px;outline:none;font-size:13px;width:100%}
+textarea{min-height:80px;resize:vertical;font-family:var(--mono);font-size:12px}
+input:focus,textarea:focus,select:focus{border-color:var(--brass)}
+.app{min-height:100dvh;display:grid;grid-template-rows:64px 1fr}
+header{display:flex;align-items:center;border-bottom:1px solid var(--line);background:var(--void-2);user-select:none;padding:0 22px;gap:14px;position:sticky;top:0;z-index:50}
+.brand .mark{width:38px;height:38px;background:linear-gradient(135deg,var(--brass),var(--amber));border-radius:6px;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:22px;color:var(--void)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .name{font-family:var(--serif);font-weight:700;font-size:18px}
+.brand .seal{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.16em;text-transform:uppercase}
+nav.tabs{display:flex;flex:1;justify-content:center;gap:4px;flex-wrap:wrap;overflow-x:auto}
+nav.tabs button{padding:8px 14px;font-size:13px;color:var(--cream-dim);letter-spacing:.04em;border-radius:4px;white-space:nowrap}
+nav.tabs button:hover{color:var(--cream);background:var(--ink)}
+nav.tabs button.active{color:var(--brass);background:var(--ink);border-bottom:2px solid var(--brass)}
+.tier{padding:6px 12px;border-radius:3px;font-size:11px;color:var(--cream-dim);font-family:var(--mono);border:1px solid var(--line);letter-spacing:.06em;text-transform:uppercase}
+.id-pill{padding:6px 14px;border-radius:14px;font-size:11px;color:var(--brass);font-family:var(--mono);border:1px solid var(--brass);letter-spacing:.06em;text-transform:uppercase;background:rgba(184,151,74,.08)}
+main{padding:24px 32px 80px;overflow-y:auto;max-width:1300px;margin:0 auto;width:100%}
+.hero{background:linear-gradient(135deg,rgba(184,151,74,.08),rgba(255,140,0,.04));border:1px solid var(--brass);border-radius:6px;padding:28px 30px;margin-bottom:24px}
+.hero h1{font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:8px;color:var(--brass)}
+.hero .lede{font-size:14px;color:var(--cream-dim);line-height:1.7;max-width:900px}
+.hero .v-badge{display:inline-block;background:var(--brass);color:var(--void);font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:3px 8px;border-radius:3px;margin-left:10px;vertical-align:middle}
+.section-h{display:flex;justify-content:space-between;align-items:baseline;margin:24px 0 14px;gap:14px;flex-wrap:wrap}
+.section-h h2{font-family:var(--serif);font-size:18px;font-weight:600}
+.section-h .sub{font-family:var(--mono);font-size:11px;color:var(--cream-muted);letter-spacing:.08em;text-transform:uppercase}
+.card{background:var(--void-2);border:1px solid var(--line);border-radius:5px;padding:18px 20px;margin-bottom:14px}
+.card h3{font-family:var(--serif);font-size:15px;font-weight:600;margin-bottom:10px}
+.inst-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:18px}
+.inst-card{background:var(--void-2);border:1px solid var(--line);border-radius:5px;padding:18px;cursor:pointer;transition:all .15s;position:relative;text-align:center}
+.inst-card:hover{border-color:var(--brass)}
+.inst-card.active{border-color:var(--brass);background:linear-gradient(180deg,rgba(184,151,74,.06),transparent)}
+.inst-card .glyph{font-size:36px;color:var(--brass);font-family:var(--serif);line-height:1;margin-bottom:10px}
+.inst-card .name{font-family:var(--serif);font-size:16px;font-weight:600;margin-bottom:6px}
+.inst-card .desc{font-size:12px;color:var(--cream-dim);line-height:1.5}
+.inst-card .active-flag{position:absolute;top:10px;right:12px;background:var(--brass);color:var(--void);font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.field label{display:block;font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.btn{padding:8px 16px;border:1px solid var(--brass);border-radius:3px;font-size:12px;color:var(--cream);background:transparent}
+.btn:hover{border-color:var(--amber);color:var(--amber)}
+.btn.brass{background:var(--brass);color:var(--void);border-color:var(--brass);font-weight:600}
+.btn.brass:hover{background:var(--amber)}
+.btn.sm{padding:5px 11px;font-size:11px}
+.btn.ghost{border-color:var(--line);color:var(--cream-dim)}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brass);color:var(--void);padding:10px 20px;border-radius:3px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;opacity:0;transition:all .22s;z-index:1100;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red);color:#fff}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.66);display:none;align-items:flex-start;justify-content:center;z-index:1000;padding:60px 22px;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:var(--void-2);border:1px solid var(--brass);border-radius:6px;padding:24px 26px;max-width:780px;width:100%;max-height:82vh;overflow-y:auto;position:relative}
+.modal h3{font-family:var(--serif);font-size:18px;margin-bottom:16px;color:var(--brass)}
+.modal .close{position:absolute;top:12px;right:14px;color:var(--cream-muted);font-size:22px;line-height:1}
+.modal .close:hover{color:var(--cream)}
+.disclaimer{background:rgba(139,26,26,.12);border:1px solid var(--ox);border-left:3px solid var(--ox);border-radius:3px;padding:12px 16px;margin-bottom:16px;font-size:12px;line-height:1.55;color:var(--cream-dim)}
+.disclaimer strong{color:var(--brass)}
+.member-row{padding:12px 14px;border:1px solid var(--line);border-radius:3px;margin-bottom:6px;background:var(--ink);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}
+.member-row .glyph{font-size:22px;color:var(--brass);font-family:var(--serif)}
+.member-row .nm{font-weight:600}
+.member-row .meta{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.06em;margin-top:3px}
+.member-row .key-short{color:var(--brass)}
+.role-pill{display:inline-block;padding:3px 9px;border-radius:11px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;background:rgba(184,151,74,.15);color:var(--brass)}
+.role-pill.steward,.role-pill.master,.role-pill.founder,.role-pill.council-member{background:rgba(255,140,0,.15);color:var(--amber)}
+.role-pill.candidate,.role-pill.prospective,.role-pill.apprentice{background:rgba(168,85,247,.15);color:var(--violet)}
+.role-pill.departed{background:rgba(110,106,94,.2);color:var(--cream-muted)}
+.proposal-card{padding:14px 16px;border:1px solid var(--line);border-radius:4px;margin-bottom:10px;background:var(--ink)}
+.proposal-card .head{display:flex;justify-content:space-between;margin-bottom:8px;align-items:baseline}
+.proposal-card .title{font-weight:600}
+.proposal-card .meta{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.06em;margin-top:4px}
+.proposal-card .body{font-size:13px;color:var(--cream-dim);line-height:1.6;margin-top:6px;white-space:pre-wrap}
+.status-pill{display:inline-block;padding:3px 9px;border-radius:11px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.status-pill.open{background:rgba(96,165,250,.15);color:var(--blue)}
+.status-pill.passed{background:rgba(74,222,128,.18);color:var(--green)}
+.status-pill.failed{background:rgba(239,68,68,.15);color:var(--red)}
+.status-pill.closed{background:rgba(168,163,149,.16);color:var(--cream-dim)}
+.status-pill.draft{background:rgba(168,85,247,.15);color:var(--violet)}
+.vote-counts{display:flex;gap:14px;font-family:var(--mono);font-size:11px;margin-top:8px}
+.vote-counts .y{color:var(--green)} .vote-counts .n{color:var(--red)} .vote-counts .a{color:var(--cream-muted)}
+.charter-text{background:var(--ink);border:1px solid var(--line);border-radius:4px;padding:18px 22px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--cream);white-space:pre-wrap;max-height:60vh;overflow-y:auto}
+.ledger-item{padding:10px 14px;border:1px solid var(--line);border-radius:3px;margin-bottom:6px;background:var(--ink);font-family:var(--mono);font-size:11px;display:grid;grid-template-columns:120px 1fr auto;gap:14px;align-items:center}
+.ledger-item .ts{color:var(--cream-muted);letter-spacing:.04em}
+.ledger-item .kind{color:var(--brass);font-weight:600;letter-spacing:.04em}
+.ledger-item .hash-short{color:var(--cream-muted);font-size:10px}
+.bundle-card{padding:16px 18px;border:1px solid var(--line);border-radius:4px;margin-bottom:10px;background:var(--ink)}
+.bundle-card .head{font-weight:600;margin-bottom:6px}
+.bundle-card .meta{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.06em}
+.preview-area{background:var(--ink);border:1px solid var(--line);border-radius:4px;padding:14px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--cream-dim);white-space:pre-wrap;max-height:60vh;overflow:auto;min-height:120px}
+.inspect-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.inspect-card{background:var(--ink);border:1px solid var(--line);border-radius:4px;padding:14px}
+.inspect-card .num{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--brass)}
+.inspect-card .lbl{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.provider-row{display:grid;grid-template-columns:auto 90px 1fr 110px 80px;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:3px;margin-bottom:6px;align-items:center;font-size:12px;background:var(--ink)}
+.provider-row .toggle{width:36px;height:20px;background:var(--line);border-radius:11px;position:relative;cursor:pointer;flex-shrink:0}
+.provider-row .toggle.on{background:var(--green)}
+.provider-row .toggle::after{content:'';position:absolute;width:16px;height:16px;background:var(--cream);border-radius:50%;top:2px;left:2px;transition:left .2s}
+.provider-row .toggle.on::after{left:18px}
+.provider-row .nm{font-family:var(--mono);font-size:11px;color:var(--cream);font-weight:600}
+.provider-row .tier-tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:2px 6px;border-radius:3px;text-transform:uppercase;text-align:center}
+.provider-row .tier-tag.t1{background:rgba(74,222,128,.15);color:var(--green)}
+.provider-row .tier-tag.t2{background:rgba(96,165,250,.15);color:var(--blue)}
+.provider-row .tier-tag.tf{background:rgba(168,85,247,.15);color:var(--violet)}
+.provider-row .tier-tag.tp{background:rgba(255,140,0,.15);color:var(--amber)}
+.provider-row .key-input{padding:5px 8px;font-size:11px}
+.provider-row .status-mini{font-family:var(--mono);font-size:10px;color:var(--cream-muted);text-align:right}
+.empty-state{padding:32px 24px;text-align:center;color:var(--cream-muted);background:var(--ink);border:1px dashed var(--line);border-radius:5px;font-size:13px}
+.banner-attack{padding:16px 20px;border:1px solid var(--gold,var(--brass));border-left:3px solid var(--brass);border-radius:3px;background:linear-gradient(135deg,rgba(184,151,74,.08),transparent);margin-bottom:18px;font-size:13px;line-height:1.65;color:var(--cream)}
+.banner-attack strong{color:var(--brass)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="mark">◊</div>
+      <div>
+        <div class="name">FallSeed · Village</div>
+        <div class="seal">level-4 seed · prime 1277 · ◊·κ=1</div>
+      </div>
+    </div>
+    <nav class="tabs"></nav>
+    <div class="id-pill" id="headerIdentity">◊ no identity</div>
+  </header>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<script>
+const SEED_DEFAULT = {
+  manifest: {
+    name: 'village',
+    vertical: 'Institution · governance-tier seed · 5 institution presets',
+    version: '1.0.0',
+    prime: 1277,
+    level: 4,
+    parent: null,
+    primeWindow: [1277],
+    bundleRoles: ['charter', 'members', 'proposals', 'votes', 'ledger', 'bundles'],
+    meshChannel: 'fall-village',
+    bloomVector: [5, 5, 5, 5, 5, 4, 4],
+    foldSequence: '●〜┃♡△◐◯',
+    licence: 'MIT', author: 'Simon Gant', seal: '◊·κ=1',
+    socketNote: 'Multi-actor coordination via signed JSON bundles (Web Crypto Ed25519). When Socket VIII unlocks live mesh, same SEED schema runs over P2P with no code changes.'
+  },
+  institutions: {
+    "village": {
+      name: 'Village', glyph: '◉',
+      description: 'General-purpose intentional community. Equal-vote roster, charter that any member can propose to amend, supermajority for big decisions.',
+      charterTemplate: '# Village Charter\n\n## Membership\nMembers are admitted by 2/3 vote of existing members. Members can depart at any time. Members can be removed only by 3/4 vote of remaining members.\n\n## Decisions\n- **Routine** (operational): simple majority of votes cast within 7 days.\n- **Charter amendments**: 3/4 of all members.\n- **Spending above [threshold]**: 2/3 of all members.\n- **Admitting members**: 2/3 of existing members.\n\n## Process\nProposals are written, signed, and broadcast as bundles. Voting is by signed bundle. Anyone can call a vote. The ledger is append-only and verifiable.\n\n## Disputes\nDisputes about ledger integrity are resolved by reconciling signed bundles in timestamp order. Disputes about charter interpretation are resolved by a 2/3 vote on the contested reading.',
+      memberRoles: ['founder', 'member', 'candidate', 'departed'],
+      proposalTypes: [
+        { code: 'admit-member', label: 'Admit a new member', threshold: '2/3 existing' },
+        { code: 'remove-member', label: 'Remove a member', threshold: '3/4 remaining' },
+        { code: 'amend-charter', label: 'Amend the charter', threshold: '3/4 all members' },
+        { code: 'spend', label: 'Authorise spending', threshold: '2/3 all members' },
+        { code: 'decide', label: 'Routine decision', threshold: 'simple majority' },
+      ],
+      defaultVotingDays: 7
+    },
+    "guild": {
+      name: 'Guild', glyph: '◇',
+      description: 'Craft / professional guild. Tiered membership (apprentice/journeyman/master), advancement by peer review, standards-setting by masters only.',
+      charterTemplate: '# Guild Charter\n\n## Tiered Membership\n- **Apprentice**: admitted by sponsor (a master). Cannot vote on standards.\n- **Journeyman**: advanced from apprentice by 2 master endorsements + 1 year minimum.\n- **Master**: advanced from journeyman by 3 master endorsements + portfolio review.\n\n## Decisions\n- **Craft standards / qualifications**: masters only, 2/3 majority.\n- **Member discipline**: masters + journeymen, 2/3 majority.\n- **Operational decisions**: all members, simple majority.\n- **Charter amendments**: masters only, 3/4 majority.\n\n## Process\nEndorsements are signed bundles. Portfolio reviews can include linked artefacts. Standards documents are versioned in the ledger.',
+      memberRoles: ['master', 'journeyman', 'apprentice', 'departed'],
+      proposalTypes: [
+        { code: 'admit-apprentice', label: 'Sponsor an apprentice', threshold: '1 master sponsor' },
+        { code: 'promote-journeyman', label: 'Promote to journeyman', threshold: '2 master endorsements' },
+        { code: 'promote-master', label: 'Promote to master', threshold: '3 master endorsements + portfolio' },
+        { code: 'set-standard', label: 'Adopt a craft standard', threshold: '2/3 of masters' },
+        { code: 'discipline', label: 'Disciplinary action', threshold: '2/3 of masters + journeymen' },
+        { code: 'amend-charter', label: 'Amend the charter', threshold: '3/4 of masters' },
+      ],
+      defaultVotingDays: 14
+    },
+    "dao": {
+      name: 'DAO', glyph: '◈',
+      description: 'Decentralised autonomous organisation for an open-source project or shared infrastructure. Weighted voting by contribution score. Treasury actions require multi-sig.',
+      charterTemplate: '# DAO Charter\n\n## Membership & Voting Power\nMembers are admitted by any 2 existing members. Voting power is proportional to contribution score (set by merit committee, capped at 10× the median).\n\n## Treasury Operations\nAll treasury actions require 3-of-5 signatures from current stewards. Stewards are elected every 6 months by all-member quadratic vote.\n\n## Decisions\n- **Operational** (under treasury threshold): 3-of-5 stewards.\n- **Strategic** (above threshold or non-financial): all members, weighted, 2/3.\n- **Charter amendments**: all members, weighted, 3/4 + 6-week deliberation period.\n\n## Process\nAll proposals + votes signed and on the ledger. Treasury actions logged separately. Multi-sig is enforced by counting 3 valid signed approval bundles before execution.',
+      memberRoles: ['steward', 'contributor', 'member', 'candidate'],
+      proposalTypes: [
+        { code: 'admit-member', label: 'Admit a member', threshold: '2 existing approvals' },
+        { code: 'elect-stewards', label: 'Elect stewards (6m)', threshold: 'all members, quadratic vote' },
+        { code: 'treasury-spend', label: 'Treasury spend', threshold: '3 of 5 stewards' },
+        { code: 'strategic', label: 'Strategic decision', threshold: '2/3 weighted' },
+        { code: 'amend-charter', label: 'Amend the charter', threshold: '3/4 weighted, 6w delay' },
+        { code: 'set-contribution', label: 'Update contribution score', threshold: 'merit committee 2/3' },
+      ],
+      defaultVotingDays: 14
+    },
+    "housing-coop": {
+      name: 'Housing co-op', glyph: '◍',
+      description: 'Residential co-operative. Each household is one member (one vote). Charter covers admissions, maintenance, finances, dispute resolution.',
+      charterTemplate: '# Housing Co-op Charter\n\n## Membership\nEach household = one member, one vote. Membership transfers on property sale, subject to co-op approval by 2/3 of existing members.\n\n## Decisions\n- **Routine maintenance + operational spending**: simple majority of households present.\n- **Major capital spending** (above [threshold] or one-off): 2/3 of all households.\n- **Admitting new household / refusing transfer**: 2/3 of existing households.\n- **Rule changes / charter amendments**: 3/4 of all households.\n\n## Dispute Resolution\nFirst step: direct conversation. Second: mediation by 2 uninvolved members. Third: 2/3 vote on a binding resolution.\n\n## Process\nAll decisions logged. Bundles can be exchanged in person at quarterly meetings or asynchronously.',
+      memberRoles: ['household', 'prospective', 'departed'],
+      proposalTypes: [
+        { code: 'admit-household', label: 'Admit a new household', threshold: '2/3 existing' },
+        { code: 'major-spending', label: 'Major spending', threshold: '2/3 of households' },
+        { code: 'routine-spending', label: 'Routine spending', threshold: 'simple majority' },
+        { code: 'amend-charter', label: 'Amend the charter', threshold: '3/4 of households' },
+        { code: 'mediate-dispute', label: 'Open a dispute', threshold: 'mediation step' },
+        { code: 'binding-resolution', label: 'Binding dispute resolution', threshold: '2/3 vote' },
+      ],
+      defaultVotingDays: 21
+    },
+    "parish": {
+      name: 'Parish council', glyph: '◌',
+      description: 'Local community council. Elected representatives with fixed terms. Open meetings, public ledger, simple majority on most things.',
+      charterTemplate: '# Parish Council Charter\n\n## Membership\nCouncil members are elected by residents for 4-year terms. Up to 9 seats. Anyone resident in the parish can stand.\n\n## Decisions\n- **All routine matters**: simple majority of council members present.\n- **Annual budget**: 2/3 of council.\n- **Charter / standing orders amendments**: 2/3 of council + 3-month public notice.\n\n## Public Process\nAll proposals, votes, and decisions are public. Bundles are published openly. Residents (not council members) can submit petitions which trigger an open meeting and a council vote if they reach [threshold] signatures.\n\n## Transparency\nThe ledger is the authoritative record. All meetings minuted and ledger-anchored.',
+      memberRoles: ['council-member', 'resident', 'departed'],
+      proposalTypes: [
+        { code: 'routine', label: 'Routine decision', threshold: 'simple majority' },
+        { code: 'annual-budget', label: 'Adopt annual budget', threshold: '2/3 of council' },
+        { code: 'amend-charter', label: 'Amend standing orders', threshold: '2/3 + 3-month notice' },
+        { code: 'respond-petition', label: 'Respond to a petition', threshold: 'mandatory vote' },
+        { code: 'appoint-chair', label: 'Appoint chair (annual)', threshold: 'simple majority' },
+      ],
+      defaultVotingDays: 14
+    }
+  },
+  buildPromptSystem: `You are FallSeed-Build, the generative substrate of the FallSeed Village wedge.
+
+You generate sovereign single-HTML tools that extend an institution-tier substrate: charters, member roles, proposal types, voting thresholds, ledger schemas. Every tool you produce MUST:
+
+1. Be a COMPLETE single HTML file starting with <!DOCTYPE html> and ending with <\/html>.
+2. Inline CSS using the FallSeed dark palette.
+3. Inline JS. Use 'use strict'. Escape close-script as <\/script>.
+4. Store data in IndexedDB keyed by the tool name.
+5. BroadcastChannel 'fall-village' for mesh sync.
+6. fall-signal hello on boot with {source, type:'hello', prime, version, level:4, parent}.
+7. P3 audit chain on every state mutation.
+8. Web Crypto Ed25519 sign/verify on every bundle export/import.
+9. seedDemo() with 2-3 sample records.
+10. Min 3 tabs: main list, settings (Export/Import/Wipe), Q&A.
+11. Modal pattern for add/edit.
+12. Reuse CSS classes: nav.tabs, .card, .btn, .btn.brass, .btn.sm, .toast, .modal-bg, .modal, .field, .row.
+13. Disclaimer at top noting this is governance scaffolding, not legal advice.
+14. Inline PWA manifest.
+15. <meta name="prime" content="XXXX"> with prime > 1277 not already used.
+16. Name with prefix 'fallvg' (e.g. fallvgballot, fallvgtreasury, fallvgminutes).
+
+Output the complete HTML file only. No preamble, no markdown fences.`
+};
+
+
+'use strict';
+
+const PROVIDERS = [
+  { id:'webllm', name:'WebLLM', tier:'T1', tierLabel:'sovereign', priority:1, model:'Llama-3.2-3B-Instruct-q4f16_1-MLC', defaultEnabled:false, supportsStream:true, pricePer1MIn:0, pricePer1MOut:0, note:'In-browser via WebGPU. ~2GB first load. Free, offline.' },
+  { id:'ollama', name:'Ollama (local)', tier:'T2', tierLabel:'sovereign', priority:2, endpoint:'http://localhost:11434/v1/chat/completions', model:'llama3.2', defaultEnabled:true, supportsStream:true, note:'localhost:11434' },
+  { id:'lmstudio', name:'LM Studio (local)', tier:'T2', tierLabel:'sovereign', priority:3, endpoint:'http://localhost:1234/v1/chat/completions', model:'loaded', defaultEnabled:true, supportsStream:true, note:'localhost:1234' },
+  { id:'groq', name:'Groq', tier:'T3-free', tierLabel:'free', priority:4, endpoint:'https://api.groq.com/openai/v1/chat/completions', model:'llama-3.3-70b-versatile', requiresKey:true, freeTier:true, defaultEnabled:true, supportsStream:true, signupUrl:'https://console.groq.com/keys', note:'30 req/min · Llama 3.3 70B · fastest cloud' },
+  { id:'openrouter-free', name:'OpenRouter free', tier:'T3-free', tierLabel:'free', priority:5, endpoint:'https://openrouter.ai/api/v1/chat/completions', model:'meta-llama/llama-3.3-70b-instruct:free', requiresKey:true, freeTier:true, defaultEnabled:true, supportsStream:true, signupUrl:'https://openrouter.ai/keys', note:'Free Llama 3.3 70B · 200 req/day' },
+  { id:'google', name:'Google AI Studio', tier:'T3-free', tierLabel:'free', priority:6, endpoint:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent', model:'gemini-2.5-flash', requiresKey:true, freeTier:true, defaultEnabled:true, supportsStream:true, signupUrl:'https://aistudio.google.com/apikey', note:'Gemini 2.5 Flash free · 15 req/min · 1M tokens/day' },
+  { id:'cerebras', name:'Cerebras', tier:'T3-free', tierLabel:'free', priority:7, endpoint:'https://api.cerebras.ai/v1/chat/completions', model:'llama-3.3-70b', requiresKey:true, freeTier:true, defaultEnabled:true, supportsStream:true, signupUrl:'https://cloud.cerebras.ai/platform', note:'Llama 3.3 70B at ~2200 tok/sec' },
+  { id:'anthropic', name:'Anthropic (paid)', tier:'T3-paid', tierLabel:'paid', priority:8, endpoint:'https://api.anthropic.com/v1/messages', model:'claude-sonnet-4-20250514', requiresKey:true, paid:true, defaultEnabled:false, supportsStream:true, signupUrl:'https://console.anthropic.com/', note:'Sonnet 4 · highest quality codegen' }
+];
+
+const TABS = [
+  { id:'welcome',    label:'Welcome' },
+  { id:'institution',label:'Institution' },
+  { id:'members',    label:'Members' },
+  { id:'charter',    label:'Charter' },
+  { id:'proposals',  label:'Proposals' },
+  { id:'myvotes',    label:'My votes' },
+  { id:'ledger',     label:'Ledger' },
+  { id:'bundles',    label:'Bundles' },
+  { id:'build',      label:'Build' },
+  { id:'providers',  label:'LLM Providers' },
+  { id:'packager',   label:'Fork Seed' },
+  { id:'inspect',    label:'Inspect' },
+  { id:'settings',   label:'Settings' },
+  { id:'install',    label:'Install' }
+];
+
+let state = {
+  active: 'welcome',
+  currentInstitution: 'village',
+  providerConfig: {},
+  rateLimits: {},
+  usage: {},
+  webllmEngine: null,
+  webllmStatus: 'unloaded',
+  autoDetected: [],
+  pkgDraft: null,
+  cascadeTrace: [],
+  identity: null,         // {id, displayName, publicKeyJwk, privateKeyJwk}
+};
+
+const $ = (s, p=document) => p.querySelector(s);
+const $$ = (s, p=document) => [...p.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = p => (p || '') + '_' + Math.random().toString(36).slice(2, 11);
+const now = () => Date.now();
+
+function toast(m, err) { const t=$('#toast'); t.textContent=m; t.classList.toggle('err',!!err); t.classList.add('show'); clearTimeout(t._to); t._to=setTimeout(()=>t.classList.remove('show'),2800); }
+function openModal(title, body) { $('#modalTitle').textContent=title; $('#modalBody').innerHTML=body; $('#modalBg').classList.add('open'); }
+function closeModal() { $('#modalBg').classList.remove('open'); }
+
+const IDB_NAME = 'fallseed-village-v1';
+let db;
+function openDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('config'))    d.createObjectStore('config');
+      if (!d.objectStoreNames.contains('members'))   d.createObjectStore('members',   { keyPath:'id' });
+      if (!d.objectStoreNames.contains('proposals')) d.createObjectStore('proposals', { keyPath:'id' });
+      if (!d.objectStoreNames.contains('votes'))     d.createObjectStore('votes',     { keyPath:'id' });
+      if (!d.objectStoreNames.contains('ledger'))    d.createObjectStore('ledger',    { keyPath:'id' });
+      if (!d.objectStoreNames.contains('bundles'))   d.createObjectStore('bundles',   { keyPath:'id' });
+      if (!d.objectStoreNames.contains('charter'))   d.createObjectStore('charter');
+    };
+    r.onsuccess = e => { db = e.target.result; res(db); };
+    r.onerror = rej;
+  });
+}
+function idbGet(s, k) { return new Promise(r => { const tx=db.transaction(s,'readonly'); const q=tx.objectStore(s).get(k); q.onsuccess=()=>r(q.result); }); }
+function idbGetAll(s) { return new Promise(r => { const tx=db.transaction(s,'readonly'); const q=tx.objectStore(s).getAll(); q.onsuccess=()=>r(q.result||[]); }); }
+function idbPut(s, v, k) { return new Promise(r => { const tx=db.transaction(s,'readwrite'); const o=tx.objectStore(s); const q=k!=null?o.put(v,k):o.put(v); q.onsuccess=()=>r(true); }); }
+function idbDelete(s, k) { return new Promise(r => { const tx=db.transaction(s,'readwrite'); const q=tx.objectStore(s).delete(k); q.onsuccess=()=>r(true); }); }
+function idbClear(s) { return new Promise(r => { const tx=db.transaction(s,'readwrite'); const q=tx.objectStore(s).clear(); q.onsuccess=()=>r(true); }); }
+
+async function sha256Hex(input) {
+  const buf = new TextEncoder().encode(typeof input === 'string' ? input : JSON.stringify(input));
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+let chainHead = '0'.repeat(64);
+async function chainNext(payload) {
+  const prev = chainHead;
+  const hash = await sha256Hex(prev + ':' + JSON.stringify(payload) + ':' + now());
+  chainHead = hash; await idbPut('config', hash, 'chainHead');
+  return { prevHash: prev, hash };
+}
+async function loadChainHead() { const h = await idbGet('config', 'chainHead'); if (h) chainHead = h; }
+
+// ═══════════════════════════════════════════════════════════════
+// CRYPTO · Ed25519 keypair + sign/verify
+// ═══════════════════════════════════════════════════════════════
+async function generateIdentity(displayName) {
+  // Use Ed25519 if supported (Chrome 129+), else fall back to ECDSA P-256
+  let kp, algo, jwkAlgo;
+  try {
+    kp = await crypto.subtle.generateKey({ name:'Ed25519' }, true, ['sign', 'verify']);
+    algo = 'Ed25519';
+  } catch (e) {
+    kp = await crypto.subtle.generateKey({ name:'ECDSA', namedCurve:'P-256' }, true, ['sign', 'verify']);
+    algo = 'ECDSA';
+  }
+  const pubJwk = await crypto.subtle.exportKey('jwk', kp.publicKey);
+  const privJwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
+  const id = (displayName||'member').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g,'') + '-' + (await sha256Hex(JSON.stringify(pubJwk))).slice(0,8);
+  return { id, displayName: displayName||'Anonymous', publicKeyJwk: pubJwk, privateKeyJwk: privJwk, algo };
+}
+async function importPublicKey(jwk, algo) {
+  if (algo === 'ECDSA') return crypto.subtle.importKey('jwk', jwk, { name:'ECDSA', namedCurve:'P-256' }, true, ['verify']);
+  return crypto.subtle.importKey('jwk', jwk, { name:'Ed25519' }, true, ['verify']);
+}
+async function importPrivateKey(jwk, algo) {
+  if (algo === 'ECDSA') return crypto.subtle.importKey('jwk', jwk, { name:'ECDSA', namedCurve:'P-256' }, true, ['sign']);
+  return crypto.subtle.importKey('jwk', jwk, { name:'Ed25519' }, true, ['sign']);
+}
+async function signPayload(payload) {
+  if (!state.identity) throw new Error('no identity loaded');
+  const priv = await importPrivateKey(state.identity.privateKeyJwk, state.identity.algo);
+  const data = new TextEncoder().encode(JSON.stringify(payload));
+  let signed;
+  if (state.identity.algo === 'ECDSA') {
+    signed = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, priv, data);
+  } else {
+    signed = await crypto.subtle.sign({ name:'Ed25519' }, priv, data);
+  }
+  return Array.from(new Uint8Array(signed)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function verifyPayload(payload, signatureHex, publicKeyJwk, algo) {
+  try {
+    const pub = await importPublicKey(publicKeyJwk, algo || 'Ed25519');
+    const data = new TextEncoder().encode(JSON.stringify(payload));
+    const sig = new Uint8Array(signatureHex.match(/.{2}/g).map(h => parseInt(h, 16)));
+    if (algo === 'ECDSA') return crypto.subtle.verify({ name:'ECDSA', hash:'SHA-256' }, pub, sig, data);
+    return crypto.subtle.verify({ name:'Ed25519' }, pub, sig, data);
+  } catch (e) { return false; }
+}
+
+async function loadAll() {
+  if (!db) await openDB();
+  await loadChainHead();
+  state.providerConfig = await idbGet('config', 'providerConfig') || {};
+  state.usage = await idbGet('config', 'usage') || {};
+  state.currentInstitution = await idbGet('config', 'currentInstitution') || 'village';
+  state.identity = await idbGet('config', 'identity') || null;
+  const savedSeed = await idbGet('config', 'forkedSeed');
+  if (savedSeed) SEED = savedSeed;
+  for (const p of PROVIDERS) {
+    if (!(p.id in state.providerConfig)) state.providerConfig[p.id] = { enabled:p.defaultEnabled, key:'', customModel:'' };
+    if (!(p.id in state.usage)) state.usage[p.id] = { totalIn:0, totalOut:0, calls:0, lastUsed:0 };
+  }
+  await idbPut('config', state.providerConfig, 'providerConfig');
+}
+async function persistProviderConfig() { await idbPut('config', state.providerConfig, 'providerConfig'); }
+async function persistInstitution() { await idbPut('config', state.currentInstitution, 'currentInstitution'); }
+async function persistIdentity() { await idbPut('config', state.identity, 'identity'); }
+
+let SEED = JSON.parse(JSON.stringify(SEED_DEFAULT));
+
+// ═══════════════════════════════════════════════════════════════
+// MESH · peer tracking + cross-seed
+// ═══════════════════════════════════════════════════════════════
+window.__fellowSeeds = window.__fellowSeeds || new Map();
+window.__crossSeedHandlers = window.__crossSeedHandlers || {};
+window.__crossSeedPending = window.__crossSeedPending || new Map();
+let __sigChan = null, __pingTimer = null;
+function __seedSelfInfo() {
+  return { source:'fallseed-village', name:SEED.manifest.name, prime:SEED.manifest.prime, version:SEED.manifest.version, level:4, parent:null, mesh:SEED.manifest.meshChannel, ts:Date.now() };
+}
+function __pruneFellowSeeds(maxAgeMs) {
+  const cutoff = Date.now() - (maxAgeMs||90000);
+  for (const [k,v] of window.__fellowSeeds.entries()) if (v.lastSeen < cutoff) window.__fellowSeeds.delete(k);
+}
+window.__crossSeedHandlers['introspect'] = async function() { return { manifest:SEED.manifest, peerCount:window.__fellowSeeds.size, ts:Date.now() }; };
+window.__crossSeedHandlers['records-export'] = async function(payload) {
+  const stores = (payload?.stores||['members','proposals','votes','ledger']).filter(s=>typeof s==='string');
+  const out = {};
+  for (const s of stores) { try { out[s] = await idbGetAll(s); } catch(e) { out[s] = {error:e.message}; } }
+  return { records:out, manifest:SEED.manifest, ts:Date.now() };
+};
+function initMesh() {
+  try {
+    __sigChan = new BroadcastChannel('fall-signal');
+    __sigChan.postMessage({ type:'hello', ...__seedSelfInfo() });
+    __sigChan.onmessage = async (e) => {
+      const m = e.data||{}; if (!m.type) return;
+      const self = 'fallseed-village';
+      if (m.type === 'hello' || m.type === 'pong') {
+        if (!m.source || m.source === self) return;
+        const ex = window.__fellowSeeds.get(m.source) || {};
+        window.__fellowSeeds.set(m.source, { ...ex, ...m, lastSeen: Date.now() });
+        if (state.active === 'inspect') try { render(); } catch(e) {}
+      } else if (m.type === 'ping') {
+        try { __sigChan.postMessage({ type:'pong', ...__seedSelfInfo() }); } catch(e) {}
+      } else if (m.type === 'request' && (m.to === self || m.to === '*') && m.from !== self) {
+        const handler = window.__crossSeedHandlers[m.kind]; if (!handler) return;
+        try { const result = await handler(m.payload||{}); __sigChan.postMessage({ type:'response', kind:m.kind, from:self, to:m.from, payload:result, reqId:m.reqId }); }
+        catch (err) { __sigChan.postMessage({ type:'response', kind:m.kind, from:self, to:m.from, payload:{error:err.message}, reqId:m.reqId }); }
+      } else if (m.type === 'response' && m.to === self) {
+        const p = window.__crossSeedPending.get(m.reqId);
+        if (p) { clearTimeout(p.timer); p.resolve(m.payload); window.__crossSeedPending.delete(m.reqId); }
+      }
+    };
+    __pingTimer = setInterval(()=>{ try { __sigChan.postMessage({type:'ping',...__seedSelfInfo()}); __pruneFellowSeeds(90000); } catch(e){} }, 30000);
+  } catch(e) {}
+}
+async function crossSeedRequest(target, kind, payload, opts) {
+  opts = opts || {}; const reqId = 'r_' + Math.random().toString(36).slice(2,12);
+  return new Promise((resolve,reject) => {
+    const timer = setTimeout(()=>{ window.__crossSeedPending.delete(reqId); reject(new Error('timeout')); }, opts.timeoutMs||3000);
+    window.__crossSeedPending.set(reqId, { resolve, reject, timer });
+    try { __sigChan.postMessage({ type:'request', kind, from:'fallseed-village', to:target, payload, reqId }); }
+    catch(e) { clearTimeout(timer); window.__crossSeedPending.delete(reqId); reject(e); }
+  });
+}
+window.crossSeedRequest = crossSeedRequest;
+
+async function autoDetectLocal() {
+  state.autoDetected = [];
+  await Promise.all([
+    fetch('http://127.0.0.1:11434/api/tags').then(r => r.ok && state.autoDetected.push('ollama')).catch(()=>{}),
+    fetch('http://127.0.0.1:1234/v1/models').then(r => r.ok && state.autoDetected.push('lmstudio')).catch(()=>{})
+  ]);
+}
+
+// ── Cascade (same shape as other seeds; abbreviated for brevity)
+function eligibleProviders() {
+  return PROVIDERS.filter(p => state.providerConfig[p.id]?.enabled && (!p.requiresKey || state.providerConfig[p.id]?.key)).sort((a,b)=>a.priority-b.priority);
+}
+function trace(msg, level) {
+  state.cascadeTrace.push({ ts:now(), msg, level:level||'info' });
+  if (state.cascadeTrace.length > 50) state.cascadeTrace.shift();
+  const el = document.getElementById('cascadeTrace'); if (el) renderCascadeTrace();
+}
+function renderCascadeTrace() {
+  const el = document.getElementById('cascadeTrace'); if (!el) return;
+  el.innerHTML = state.cascadeTrace.map(l => `<div style="padding:3px 0;color:${l.level==='ok'?'var(--green)':l.level==='fail'?'var(--cream-muted)':'var(--cream-dim)'}">${new Date(l.ts).toLocaleTimeString()} ${esc(l.msg)}</div>`).join('') || '(no calls yet)';
+}
+async function cascadeChat(prompt, opts) {
+  opts = opts || {}; const onChunk = opts.onChunk || (()=>{});
+  const system = opts.system || SEED.buildPromptSystem || 'You are a helpful assistant.';
+  const elig = eligibleProviders();
+  if (!elig.length) throw new Error('No providers enabled.');
+  trace(`cascade · ${elig.length} eligible`);
+  let lastErr = null;
+  for (const p of elig) {
+    trace(`→ ${p.name}`);
+    try {
+      const out = await callProvider(p, system, prompt, onChunk);
+      trace(`✓ ${p.name} · ${out.length} chars`, 'ok');
+      return { provider:p.id, text:out };
+    } catch (e) { trace(`✗ ${p.name}: ${e.message}`, 'fail'); lastErr = e; }
+  }
+  throw new Error('All providers failed: ' + (lastErr?.message||'?'));
+}
+async function callProvider(p, system, prompt, onChunk) {
+  const cfg = state.providerConfig[p.id]||{}; const model = cfg.customModel || p.model;
+  if (p.id === 'webllm') {
+    if (state.webllmStatus !== 'ready') throw new Error('WebLLM not loaded');
+    const reply = await state.webllmEngine.chat.completions.create({ messages:[{role:'system',content:system},{role:'user',content:prompt}], stream:true });
+    let acc=''; for await (const chunk of reply) { const d=chunk.choices[0]?.delta?.content||''; acc+=d; onChunk(d); } return acc;
+  }
+  if (p.id === 'google') {
+    const url = p.endpoint + '?alt=sse&key=' + encodeURIComponent(cfg.key);
+    const body = { systemInstruction:{parts:[{text:system}]}, contents:[{role:'user',parts:[{text:prompt}]}], generationConfig:{temperature:0.4,maxOutputTokens:4096} };
+    const r = await fetch(url, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(body) });
+    if (!r.ok) throw new Error('Google ' + r.status); return await streamSSE(r, onChunk, 'google');
+  }
+  if (p.id === 'anthropic') {
+    const r = await fetch(p.endpoint, { method:'POST', headers:{'content-type':'application/json','x-api-key':cfg.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}, body:JSON.stringify({ model, max_tokens:4096, stream:true, system, messages:[{role:'user',content:prompt}] }) });
+    if (!r.ok) throw new Error('Anthropic ' + r.status); return await streamSSE(r, onChunk, 'anthropic');
+  }
+  const headers = { 'content-type':'application/json' };
+  if (cfg.key) headers['authorization'] = 'Bearer ' + cfg.key;
+  const r = await fetch(p.endpoint, { method:'POST', headers, body:JSON.stringify({ model, messages:[{role:'system',content:system},{role:'user',content:prompt}], stream:true, temperature:0.4 }) });
+  if (!r.ok) throw new Error(p.name + ' ' + r.status);
+  return await streamSSE(r, onChunk, 'openai');
+}
+async function streamSSE(response, onChunk, kind) {
+  const reader = response.body.getReader(); const dec = new TextDecoder(); let buf='', acc='';
+  while(true) {
+    const {value,done} = await reader.read(); if (done) break;
+    buf += dec.decode(value, {stream:true});
+    const lines = buf.split(/\r?\n/); buf = lines.pop()||'';
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim(); if (data === '[DONE]') continue;
+      try {
+        const j = JSON.parse(data); let d='';
+        if (kind === 'anthropic') { if (j.type === 'content_block_delta') d = j.delta?.text||''; }
+        else if (kind === 'google') { d = j.candidates?.[0]?.content?.parts?.[0]?.text||''; }
+        else { d = j.choices?.[0]?.delta?.content||''; }
+        if (d) { acc+=d; onChunk(d); }
+      } catch(e) {}
+    }
+  }
+  return acc;
+}
+
+function jsLiteral(obj, indent=0) {
+  const pad='  '.repeat(indent), padNext='  '.repeat(indent+1);
+  if (obj === null) return 'null';
+  if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+  if (typeof obj === 'string') {
+    if (obj.length > 80 || obj.includes('\n')) return '`'+obj.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$\{/g,'\\${')+'`';
+    return "'"+obj.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+  }
+  if (Array.isArray(obj)) { if (!obj.length) return '[]'; return '[\n'+obj.map(v=>padNext+jsLiteral(v,indent+1)).join(',\n')+'\n'+pad+']'; }
+  if (typeof obj === 'object') { const keys=Object.keys(obj); if (!keys.length) return '{}'; return '{\n'+keys.map(k=>padNext+(/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(k)?k:JSON.stringify(k))+': '+jsLiteral(obj[k],indent+1)).join(',\n')+'\n'+pad+'}'; }
+  return 'null';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GOVERNANCE PRIMITIVES
+// ═══════════════════════════════════════════════════════════════
+async function addLedger(kind, payload) {
+  const entry = { id: uid('l'), kind, payload, ts: now() };
+  const c = await chainNext({kind, payload});
+  entry.prevHash = c.prevHash; entry.hash = c.hash;
+  await idbPut('ledger', entry);
+  return entry;
+}
+
+async function addMember(displayName, role, publicKeyJwk, algo, signedBy) {
+  const id = (displayName||'member').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + (await sha256Hex(JSON.stringify(publicKeyJwk))).slice(0,8);
+  const m = { id, displayName, role, publicKeyJwk, algo: algo||'Ed25519', signedBy: signedBy||null, joinedAt: now() };
+  await idbPut('members', m);
+  await addLedger('member.add', { id, displayName, role });
+  return m;
+}
+
+async function exportBundle() {
+  if (!state.identity) throw new Error('create your identity first');
+  const events = await idbGetAll('ledger');
+  const sinceLast = await idbGet('config', 'lastExportTs') || 0;
+  const newEvents = events.filter(e => e.ts > sinceLast);
+  const payload = {
+    bundleType: 'fallseed-village-v1',
+    institution: state.currentInstitution,
+    from: { id: state.identity.id, displayName: state.identity.displayName, publicKeyJwk: state.identity.publicKeyJwk, algo: state.identity.algo },
+    events: newEvents,
+    ts: now()
+  };
+  const signature = await signPayload(payload);
+  const bundle = { payload, signature };
+  await idbPut('config', now(), 'lastExportTs');
+  return bundle;
+}
+
+async function importBundle(bundleJson) {
+  let bundle; try { bundle = typeof bundleJson === 'string' ? JSON.parse(bundleJson) : bundleJson; }
+  catch(e) { throw new Error('invalid JSON: ' + e.message); }
+  if (!bundle.payload || !bundle.signature || !bundle.payload.from?.publicKeyJwk) throw new Error('not a valid bundle');
+  const ok = await verifyPayload(bundle.payload, bundle.signature, bundle.payload.from.publicKeyJwk, bundle.payload.from.algo);
+  if (!ok) throw new Error('signature verification FAILED — bundle rejected');
+  // Import the sender as a member if not known
+  const members = await idbGetAll('members');
+  const known = members.find(m => m.id === bundle.payload.from.id);
+  if (!known) {
+    const inst = SEED.institutions[state.currentInstitution];
+    await addMember(bundle.payload.from.displayName, inst.memberRoles[inst.memberRoles.length-1] || 'candidate', bundle.payload.from.publicKeyJwk, bundle.payload.from.algo, bundle.payload.from.id);
+  }
+  // Replay each event
+  let imported = 0;
+  for (const ev of (bundle.payload.events||[])) {
+    const existing = (await idbGetAll('ledger')).find(x => x.hash === ev.hash);
+    if (existing) continue;
+    await idbPut('ledger', ev);
+    imported++;
+    // Apply side effects based on event kind
+    if (ev.kind === 'proposal.create') {
+      const exists = (await idbGetAll('proposals')).find(p => p.id === ev.payload.id);
+      if (!exists) await idbPut('proposals', ev.payload);
+    } else if (ev.kind === 'vote.cast') {
+      const exists = (await idbGetAll('votes')).find(v => v.id === ev.payload.id);
+      if (!exists) await idbPut('votes', ev.payload);
+    } else if (ev.kind === 'member.add') {
+      // already handled by sender import above, but ledger entry recorded
+    }
+  }
+  // Record the bundle for audit
+  const b = { id: uid('b'), importedFrom: bundle.payload.from.id, importedAt: now(), eventCount: bundle.payload.events?.length||0, importedNew: imported, signatureValid: true };
+  await idbPut('bundles', b);
+  return { imported, total: bundle.payload.events?.length||0, signatureValid: true };
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// ROUTER + TABS
+// ═══════════════════════════════════════════════════════════════
+function renderNav() {
+  const nav = $('nav.tabs');
+  nav.innerHTML = TABS.map(t => `<button data-tab="${t.id}" class="${state.active===t.id?'active':''}">${t.label}</button>`).join('');
+  nav.querySelectorAll('button').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+}
+function switchTab(id) {
+  state.active = id;
+  $$('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab===id));
+  const idEl = $('#headerIdentity');
+  if (idEl) idEl.textContent = state.identity ? ('◊ ' + state.identity.displayName + ' · ' + state.identity.id.slice(-8)) : '◊ no identity';
+  render();
+}
+function render() {
+  const main = $('#main'); main.innerHTML='';
+  const fn = { welcome:renderWelcome, institution:renderInstitution, members:renderMembers, charter:renderCharter, proposals:renderProposals, myvotes:renderMyVotes, ledger:renderLedger, bundles:renderBundles, build:renderBuild, providers:renderProviders, packager:renderPackager, inspect:renderInspect, settings:renderSettings, install:renderInstall }[state.active] || renderWelcome;
+  fn(main);
+}
+
+// ─── WELCOME ─────────────────────────────────────────────────
+async function renderWelcome(main) {
+  const members = await idbGetAll('members');
+  const proposals = await idbGetAll('proposals');
+  const inst = SEED.institutions[state.currentInstitution];
+  main.innerHTML = `
+    <div class="hero">
+      <h1>◊ FallSeed · Village <span class="v-badge">v${SEED.manifest.version}</span></h1>
+      <p class="lede">A sovereign single-HTML PWA for institution-tier governance. ${Object.keys(SEED.institutions).length} institution presets shipped: ${Object.entries(SEED.institutions).map(([k,i])=>i.glyph+' '+i.name).join(' · ')}. Each preset ships its own charter template, member roles, proposal types, and voting thresholds. Multi-actor coordination via <strong style="color:var(--brass)">signed JSON bundles</strong> (Web Crypto · Ed25519). No server. No P2P required. The bundles travel by file, link, or paste.</p>
+    </div>
+    <div class="disclaimer"><strong>Governance scaffolding, not legal advice.</strong> This tool helps a group structure decisions — it does not constitute a binding legal entity, contract, or trust. For things that need legal force (e.g. a registered DAO, a CIC, a co-op with banking), pair this with the appropriate legal wrapper.</div>
+    ${!state.identity ? `
+      <div class="banner-attack">
+        <strong>You have no signing identity yet.</strong> Before you can create proposals or cast votes, you need an Ed25519 keypair (generated locally, stored only in your IDB).
+        <div style="margin-top:10px"><button class="btn brass sm" onclick="createIdentity()">⊕ create identity →</button></div>
+      </div>
+    ` : `<div class="card"><h3>Your identity</h3><div style="font-family:var(--mono);font-size:12px;color:var(--cream-dim)">id: <span style="color:var(--brass)">${esc(state.identity.id)}</span><br>name: <strong>${esc(state.identity.displayName)}</strong><br>algorithm: ${esc(state.identity.algo)}<br>public-key fingerprint: <span style="color:var(--brass)">${(JSON.stringify(state.identity.publicKeyJwk)).slice(0,40)}…</span></div></div>`}
+    <div class="section-h"><h2>Current institution · ${inst.glyph} ${esc(inst.name)}</h2><div class="sub">${members.length} member${members.length===1?'':'s'} · ${proposals.filter(p=>p.status==='open').length} open proposal${proposals.filter(p=>p.status==='open').length===1?'':'s'}</div></div>
+    <div class="card"><p style="font-size:13px;line-height:1.65;color:var(--cream-dim)">${esc(inst.description)}</p></div>
+    <div class="section-h"><h2>Get started</h2></div>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div><h3>1. Pick institution</h3><p style="color:var(--cream-dim);font-size:12px;line-height:1.6;margin-bottom:10px">Switching presets loads a new charter template + role set + proposal types.</p><button class="btn brass sm" onclick="switchTab('institution')">Open Institution →</button></div>
+        <div><h3>2. Adopt charter</h3><p style="color:var(--cream-dim);font-size:12px;line-height:1.6;margin-bottom:10px">Customise the template, sign with your key, lock the version.</p><button class="btn brass sm" onclick="switchTab('charter')">Open Charter →</button></div>
+        <div><h3>3. Coordinate via bundles</h3><p style="color:var(--cream-dim);font-size:12px;line-height:1.6;margin-bottom:10px">Export your state as a signed bundle. Other members import. No server required.</p><button class="btn brass sm" onclick="switchTab('bundles')">Open Bundles →</button></div>
+      </div>
+    </div>
+  `;
+}
+
+window.createIdentity = async function() {
+  openModal('Create signing identity', `
+    <p style="font-size:13px;color:var(--cream-dim);margin-bottom:14px">An Ed25519 keypair is generated entirely on your device. The private key never leaves your browser. The public key is shared with other members via signed bundles.</p>
+    <div class="field" style="margin-bottom:14px"><label>Your display name (what others see)</label><input id="idName" placeholder="e.g. Simon · or any name you want"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost sm" onclick="closeModal()">cancel</button><button class="btn brass sm" onclick="confirmIdentity()">⊕ generate keypair</button></div>
+  `);
+};
+window.confirmIdentity = async function() {
+  const name = $('#idName').value.trim();
+  if (!name) { toast('name required', true); return; }
+  toast('generating keypair…');
+  try {
+    const id = await generateIdentity(name);
+    state.identity = id;
+    await persistIdentity();
+    // Add self as a founder member
+    const inst = SEED.institutions[state.currentInstitution];
+    await addMember(name, inst.memberRoles[0]||'member', id.publicKeyJwk, id.algo, id.id);
+    await addLedger('identity.created', { id: id.id, displayName: name, algo: id.algo });
+    closeModal();
+    toast('✓ identity created · ' + id.algo);
+    render();
+  } catch (e) { toast('failed: ' + e.message, true); }
+};
+
+// ─── INSTITUTION SWITCHER ────────────────────────────────────
+function renderInstitution(main) {
+  main.innerHTML = `
+    <div class="section-h"><h2>Institution presets</h2><div class="sub">current = ${esc(SEED.institutions[state.currentInstitution].name)}</div></div>
+    <div class="disclaimer"><strong>Switching is non-destructive.</strong> Your members, proposals, votes and ledger stay. The charter template + member-role names + proposal types switch to match the new preset.</div>
+    <div class="inst-grid">
+      ${Object.entries(SEED.institutions).map(([k,i]) => `<div class="inst-card ${state.currentInstitution===k?'active':''}" onclick="switchInstitution('${k}')">
+        ${state.currentInstitution===k?'<span class="active-flag">active</span>':''}
+        <div class="glyph">${i.glyph}</div>
+        <div class="name">${esc(i.name)}</div>
+        <div class="desc">${esc(i.description)}</div>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <h3>${SEED.institutions[state.currentInstitution].glyph} ${esc(SEED.institutions[state.currentInstitution].name)} · proposal types</h3>
+      ${SEED.institutions[state.currentInstitution].proposalTypes.map(t => `<div style="padding:8px 0;font-size:13px;border-bottom:1px solid var(--line-soft)">
+        <span style="font-family:var(--mono);color:var(--brass);font-size:11px;letter-spacing:.04em">${esc(t.code)}</span> · ${esc(t.label)} <span style="font-family:var(--mono);font-size:10px;color:var(--cream-muted);margin-left:8px">${esc(t.threshold)}</span>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <h3>Member roles</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">${SEED.institutions[state.currentInstitution].memberRoles.map(r => `<span class="role-pill ${r}">${esc(r)}</span>`).join('')}</div>
+    </div>
+  `;
+}
+window.switchInstitution = async function(key) {
+  state.currentInstitution = key;
+  await persistInstitution();
+  toast('institution → ' + SEED.institutions[key].name);
+  render();
+};
+
+// ─── MEMBERS ─────────────────────────────────────────────────
+async function renderMembers(main) {
+  const members = await idbGetAll('members');
+  members.sort((a,b) => (a.joinedAt||0) - (b.joinedAt||0));
+  const inst = SEED.institutions[state.currentInstitution];
+  main.innerHTML = `
+    <div class="section-h"><h2>Members</h2><div class="sub">${members.length} on roster</div></div>
+    ${!state.identity ? '<div class="empty-state">create your identity in Welcome first</div>' : ''}
+    ${members.length ? members.map(m => `<div class="member-row">
+      <div class="glyph">${(m.role==='founder'||m.role==='master'||m.role==='steward'||m.role==='council-member')?'★':'◇'}</div>
+      <div>
+        <div class="nm">${esc(m.displayName)} ${m.id===state.identity?.id?'<span style="color:var(--green);font-family:var(--mono);font-size:10px;margin-left:6px">you</span>':''}</div>
+        <div class="meta">id <span class="key-short">${esc(m.id)}</span> · joined ${new Date(m.joinedAt).toLocaleDateString()} · algo ${esc(m.algo||'Ed25519')}</div>
+      </div>
+      <div><span class="role-pill ${m.role}">${esc(m.role)}</span></div>
+    </div>`).join('') : '<div class="empty-state">no members yet · your identity becomes the first member</div>'}
+  `;
+}
+
+// ─── CHARTER ─────────────────────────────────────────────────
+async function renderCharter(main) {
+  const stored = await idbGet('charter', 'current');
+  const inst = SEED.institutions[state.currentInstitution];
+  const content = stored?.content || inst.charterTemplate;
+  main.innerHTML = `
+    <div class="section-h"><h2>Charter</h2><div class="sub">${stored ? 'v' + stored.version + ' · adopted ' + new Date(stored.adoptedAt).toLocaleDateString() : 'using preset template (not yet adopted)'}</div></div>
+    <div class="card">
+      <textarea id="charterText" rows="20" style="font-family:var(--mono);font-size:12px;line-height:1.7">${esc(content)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn brass sm" onclick="adoptCharter()" ${!state.identity?'disabled':''}>${stored?'amend + re-sign':'adopt + sign'}</button>
+        <button class="btn sm" onclick="document.getElementById('charterText').value = ${JSON.stringify(inst.charterTemplate)};">reset to preset</button>
+      </div>
+      ${stored ? `<div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:.04em">signed by: ${(stored.signedBy||[]).join(', ') || '(unsigned)'}</div>` : ''}
+    </div>
+  `;
+}
+window.adoptCharter = async function() {
+  if (!state.identity) { toast('create your identity first', true); return; }
+  const content = $('#charterText').value;
+  const prev = await idbGet('charter', 'current');
+  const version = (prev?.version || 0) + 1;
+  const charter = { version, content, signedBy: [state.identity.id], adoptedAt: now() };
+  const sig = await signPayload({ kind:'charter.adopt', version, content });
+  charter.signature = sig;
+  await idbPut('charter', charter, 'current');
+  await addLedger('charter.adopt', { version, contentHash: await sha256Hex(content), signedBy: state.identity.id });
+  toast(`✓ charter v${version} signed`);
+  render();
+};
+
+// ─── PROPOSALS ───────────────────────────────────────────────
+async function renderProposals(main) {
+  const proposals = (await idbGetAll('proposals')).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  const votes = await idbGetAll('votes');
+  const inst = SEED.institutions[state.currentInstitution];
+  main.innerHTML = `
+    <div class="section-h"><h2>Proposals</h2><div class="sub">${proposals.length} on record · ${proposals.filter(p=>p.status==='open').length} open</div></div>
+    <div style="margin-bottom:14px"><button class="btn brass sm" onclick="newProposal()" ${!state.identity?'disabled':''}>+ new proposal</button></div>
+    ${proposals.length ? proposals.map(p => {
+      const pVotes = votes.filter(v => v.proposalId === p.id);
+      const yes = pVotes.filter(v => v.choice === 'yes').length;
+      const no = pVotes.filter(v => v.choice === 'no').length;
+      const ab = pVotes.filter(v => v.choice === 'abstain').length;
+      const myVote = pVotes.find(v => v.memberId === state.identity?.id);
+      return `<div class="proposal-card">
+        <div class="head"><div class="title">${esc(p.title)}</div><span class="status-pill ${p.status}">${esc(p.status)}</span></div>
+        <div class="meta">${esc(p.type)} · ${esc(p.threshold||'')} · by ${esc(p.proposerName||p.proposerId)} · created ${new Date(p.createdAt).toLocaleDateString()}${p.deadline?' · deadline ' + new Date(p.deadline).toLocaleDateString():''}</div>
+        <div class="body">${esc(p.body)}</div>
+        <div class="vote-counts"><span class="y">${yes} yes</span><span class="n">${no} no</span><span class="a">${ab} abstain</span>${myVote?` · <span style="color:var(--brass)">you voted: ${esc(myVote.choice)}</span>`:''}</div>
+        ${p.status==='open' && state.identity && !myVote ? `<div style="display:flex;gap:6px;margin-top:10px">
+          <button class="btn brass sm" onclick="castVote('${p.id}','yes')">vote yes</button>
+          <button class="btn sm" onclick="castVote('${p.id}','no')">vote no</button>
+          <button class="btn sm ghost" onclick="castVote('${p.id}','abstain')">abstain</button>
+        </div>` : p.status==='open' && state.identity ? '<div style="margin-top:10px;font-size:11px;color:var(--cream-muted);font-family:var(--mono)">you have voted</div>' : ''}
+        ${p.status==='open' ? `<div style="margin-top:6px"><button class="btn sm ghost" onclick="closeProposal('${p.id}')">close + tally</button></div>` : ''}
+      </div>`;
+    }).join('') : '<div class="empty-state">no proposals yet · create one to start</div>'}
+  `;
+}
+window.newProposal = function() {
+  const inst = SEED.institutions[state.currentInstitution];
+  openModal('New proposal', `
+    <div class="row"><div class="field"><label>Type</label><select id="pType">${inst.proposalTypes.map(t => `<option value="${esc(t.code)}" data-threshold="${esc(t.threshold)}">${esc(t.label)} (${esc(t.threshold)})</option>`).join('')}</select></div><div class="field"><label>Deadline</label><input id="pDeadline" type="date"></div></div>
+    <div class="field" style="margin-bottom:10px"><label>Title</label><input id="pTitle"></div>
+    <div class="field" style="margin-bottom:14px"><label>Body / rationale</label><textarea id="pBody" rows="6"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost sm" onclick="closeModal()">cancel</button><button class="btn brass sm" onclick="confirmProposal()">sign + post</button></div>
+  `);
+  // default deadline: institution.defaultVotingDays from now
+  const d = new Date(); d.setDate(d.getDate() + inst.defaultVotingDays);
+  $('#pDeadline').value = d.toISOString().slice(0,10);
+};
+window.confirmProposal = async function() {
+  const inst = SEED.institutions[state.currentInstitution];
+  const type = $('#pType').value;
+  const threshold = $('#pType').selectedOptions[0]?.dataset.threshold || '';
+  const title = $('#pTitle').value.trim();
+  const body = $('#pBody').value.trim();
+  const deadline = new Date($('#pDeadline').value).getTime() || null;
+  if (!title || !body) { toast('title + body required', true); return; }
+  const p = { id: uid('p'), type, threshold, title, body, proposerId: state.identity.id, proposerName: state.identity.displayName, createdAt: now(), deadline, status: 'open', institution: state.currentInstitution };
+  const sig = await signPayload({ kind:'proposal.create', id:p.id, title, type });
+  p.signature = sig;
+  await idbPut('proposals', p);
+  await addLedger('proposal.create', p);
+  closeModal();
+  toast('✓ proposal posted + signed');
+  render();
+};
+window.castVote = async function(proposalId, choice) {
+  if (!state.identity) { toast('no identity', true); return; }
+  const existing = (await idbGetAll('votes')).find(v => v.proposalId === proposalId && v.memberId === state.identity.id);
+  if (existing) { toast('already voted', true); return; }
+  const v = { id: uid('v'), proposalId, memberId: state.identity.id, memberName: state.identity.displayName, choice, ts: now() };
+  v.signature = await signPayload({ kind:'vote.cast', proposalId, memberId: v.memberId, choice });
+  await idbPut('votes', v);
+  await addLedger('vote.cast', v);
+  toast('✓ vote signed · ' + choice);
+  render();
+};
+window.closeProposal = async function(id) {
+  const proposals = await idbGetAll('proposals');
+  const p = proposals.find(x => x.id === id); if (!p) return;
+  const votes = (await idbGetAll('votes')).filter(v => v.proposalId === id);
+  const yes = votes.filter(v => v.choice === 'yes').length;
+  const no = votes.filter(v => v.choice === 'no').length;
+  // Naive tally: pass if yes > no (real charter rules vary). The threshold text is for human reference.
+  p.status = yes > no ? 'passed' : 'failed';
+  p.closedAt = now();
+  p.tally = { yes, no, abstain: votes.length - yes - no };
+  await idbPut('proposals', p);
+  await addLedger('proposal.close', { id, status: p.status, tally: p.tally });
+  toast('proposal closed · ' + p.status);
+  render();
+};
+
+// ─── MY VOTES ────────────────────────────────────────────────
+async function renderMyVotes(main) {
+  if (!state.identity) { main.innerHTML = '<div class="empty-state">no identity</div>'; return; }
+  const votes = (await idbGetAll('votes')).filter(v => v.memberId === state.identity.id).sort((a,b)=>b.ts-a.ts);
+  const proposals = await idbGetAll('proposals');
+  main.innerHTML = `
+    <div class="section-h"><h2>My votes</h2><div class="sub">${votes.length} cast</div></div>
+    ${votes.length ? votes.map(v => {
+      const p = proposals.find(x => x.id === v.proposalId);
+      return `<div class="proposal-card">
+        <div class="head"><div class="title">${esc(p?.title || v.proposalId)}</div><span class="status-pill ${v.choice==='yes'?'passed':v.choice==='no'?'failed':'closed'}">${esc(v.choice)}</span></div>
+        <div class="meta">${new Date(v.ts).toLocaleString()} · signature ${esc((v.signature||'').slice(0,16))}…</div>
+      </div>`;
+    }).join('') : '<div class="empty-state">no votes cast yet</div>'}
+  `;
+}
+
+// ─── LEDGER ──────────────────────────────────────────────────
+async function renderLedger(main) {
+  const entries = (await idbGetAll('ledger')).sort((a,b) => b.ts - a.ts);
+  main.innerHTML = `
+    <div class="section-h"><h2>Ledger</h2><div class="sub">${entries.length} entries · prevHash + SHA-256 chained</div></div>
+    ${entries.length ? entries.slice(0,150).map(e => `<div class="ledger-item">
+      <div class="ts">${new Date(e.ts).toLocaleString()}</div>
+      <div><span class="kind">${esc(e.kind)}</span> · ${esc(JSON.stringify(e.payload).slice(0,100))}${JSON.stringify(e.payload).length>100?'…':''}</div>
+      <div class="hash-short">${esc((e.hash||'').slice(0,12))}</div>
+    </div>`).join('') + (entries.length > 150 ? `<div class="empty-state" style="margin-top:14px">… and ${entries.length-150} earlier entries</div>` : '') : '<div class="empty-state">empty ledger</div>'}
+  `;
+}
+
+// ─── BUNDLES ─────────────────────────────────────────────────
+async function renderBundles(main) {
+  const bundles = (await idbGetAll('bundles')).sort((a,b) => b.importedAt - a.importedAt);
+  main.innerHTML = `
+    <div class="section-h"><h2>Bundles</h2><div class="sub">signed event bundles · the coordination substrate</div></div>
+    <div class="banner-attack"><strong>How coordination works without a server:</strong> each member exports their state changes as a signed JSON bundle. Other members import bundles. The signature proves authorship; deterministic merge resolves order. Pass bundles by file, email, link, or paste. When Socket VIII (live P2P mesh) lands, the same bundles will flow continuously — no code change required.</div>
+    <div class="card">
+      <h3>Export</h3>
+      <p style="font-size:12px;color:var(--cream-dim);margin-bottom:10px">Generate a signed bundle of your state changes since your last export. Share by file / link / paste.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn brass sm" onclick="doExportBundle()" ${!state.identity?'disabled':''}>⬇ export signed bundle</button>
+        <button class="btn sm" onclick="copyBundleToClipboard()" ${!state.identity?'disabled':''}>📋 copy to clipboard</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Import</h3>
+      <p style="font-size:12px;color:var(--cream-dim);margin-bottom:10px">Paste a bundle JSON from another member, or upload a bundle file. Signature is verified; if valid, events merge into your ledger.</p>
+      <textarea id="bundleIn" placeholder="paste bundle JSON here…" rows="6"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn brass sm" onclick="doImportBundlePaste()">⬆ import from paste</button>
+        <button class="btn sm" onclick="document.getElementById('bundleFile').click()">⬆ import from file</button>
+        <input id="bundleFile" type="file" accept=".json" style="display:none" onchange="doImportBundleFile(this.files[0])">
+      </div>
+    </div>
+    <div class="section-h"><h2>Imported bundles</h2></div>
+    ${bundles.length ? bundles.map(b => `<div class="bundle-card">
+      <div class="head">from <span style="color:var(--brass)">${esc(b.importedFrom)}</span> · ${b.signatureValid?'<span style="color:var(--green)">signature valid</span>':'<span style="color:var(--red)">signature INVALID</span>'}</div>
+      <div class="meta">${new Date(b.importedAt).toLocaleString()} · ${b.eventCount} event${b.eventCount===1?'':'s'} · ${b.importedNew||0} new</div>
+    </div>`).join('') : '<div class="empty-state">no bundles imported yet</div>'}
+  `;
+}
+window.doExportBundle = async function() {
+  try {
+    const b = await exportBundle();
+    const blob = new Blob([JSON.stringify(b, null, 2)], { type:'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'fallseed-village-bundle-' + new Date().toISOString().slice(0,10) + '-' + state.identity.id.slice(-6) + '.json'; a.click();
+    toast('✓ exported · ' + (b.payload.events?.length||0) + ' events signed');
+  } catch (e) { toast('export failed: ' + e.message, true); }
+};
+window.copyBundleToClipboard = async function() {
+  try {
+    const b = await exportBundle();
+    await navigator.clipboard.writeText(JSON.stringify(b, null, 2));
+    toast('✓ bundle copied to clipboard');
+  } catch (e) { toast('failed: ' + e.message, true); }
+};
+window.doImportBundlePaste = async function() {
+  const text = $('#bundleIn').value.trim();
+  if (!text) { toast('paste a bundle first', true); return; }
+  try {
+    const r = await importBundle(text);
+    toast(`✓ imported ${r.imported}/${r.total} new events · sig ${r.signatureValid?'valid':'INVALID'}`);
+    $('#bundleIn').value = '';
+    render();
+  } catch (e) { toast('import failed: ' + e.message, true); }
+};
+window.doImportBundleFile = async function(file) {
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const r = await importBundle(text);
+    toast(`✓ imported ${r.imported}/${r.total} new events`);
+    render();
+  } catch (e) { toast('import failed: ' + e.message, true); }
+};
+
+// ─── BUILD / PROVIDERS / FORK / INSPECT / SETTINGS / INSTALL (shared shape) ───
+function renderBuild(main) {
+  const examples = ['Generate 3 more proposal types for the housing-coop preset.', 'Define a new institution preset "Research lab" with charter template, member roles, proposal types.', 'Write a meeting-minutes template for parish council that maps to ledger entries.'];
+  main.innerHTML = `
+    <div class="section-h"><h2>Build</h2><div class="sub">cascade for one-off generation</div></div>
+    <div class="card">
+      <h3>What do you need?</h3>
+      <textarea id="buildPrompt" rows="4" placeholder="Describe the institution, charter clause, proposal type or workflow you need…"></textarea>
+      <div style="margin:10px 0">${examples.map(x => `<button onclick="document.getElementById('buildPrompt').value=this.textContent" style="padding:5px 10px;font-size:11px;border:1px solid var(--line);border-radius:11px;color:var(--cream-dim);background:var(--ink);margin-right:6px;margin-bottom:6px">${esc(x.slice(0,60))}…</button>`).join('')}</div>
+      <button class="btn brass" id="buildGo">Generate →</button>
+    </div>
+    <div class="card"><h3>Cascade trace</h3><div id="cascadeTrace" style="font-family:var(--mono);font-size:11px;background:var(--ink);border:1px solid var(--line);border-radius:3px;padding:10px 12px;max-height:200px;overflow-y:auto"></div></div>
+    <div class="card"><h3>Output</h3><pre class="preview-area" id="buildOutput">(idle)</pre></div>
+  `;
+  renderCascadeTrace();
+  $('#buildGo').addEventListener('click', async () => {
+    const p = $('#buildPrompt').value.trim(); if (!p) { toast('enter a prompt', true); return; }
+    const out = $('#buildOutput'); out.textContent = '';
+    try { await cascadeChat(p, { onChunk: d => { out.textContent += d; out.scrollTop = out.scrollHeight; } }); }
+    catch (e) { out.textContent = '✗ ' + e.message; }
+  });
+}
+
+function renderProviders(main) {
+  main.innerHTML = `
+    <div class="section-h"><h2>LLM providers</h2><div class="sub">auto-detected: ${state.autoDetected.length?state.autoDetected.join(', '):'none'}</div></div>
+    <div class="card">${PROVIDERS.map(p => {
+      const cfg = state.providerConfig[p.id]||{}; const tc = p.tier==='T1'?'t1':p.tier==='T2'?'t2':p.tier==='T3-free'?'tf':'tp';
+      return `<div class="provider-row"><div class="toggle ${cfg.enabled?'on':''}" onclick="toggleProvider('${p.id}')"></div><div class="tier-tag ${tc}">${p.tier}</div><div><div class="nm">${esc(p.name)}</div><div style="font-size:10px;color:var(--cream-muted);font-family:var(--mono);margin-top:2px;letter-spacing:.04em">${esc(p.note)}</div></div>${p.requiresKey?`<input class="key-input" type="password" value="${esc(cfg.key||'')}" placeholder="api key" onchange="setProviderKey('${p.id}', this.value)">`:'<div></div>'}<div class="status-mini">${p.requiresKey && !cfg.key?'<a href="'+(p.signupUrl||'#')+'" target="_blank" style="color:var(--brass)">sign up</a>':(cfg.enabled?'active':'off')}</div></div>`;
+    }).join('')}</div>
+    <div class="card"><h3>WebLLM</h3><button class="btn brass sm" id="loadWebllm">${state.webllmStatus==='ready'?'✓ ready':state.webllmStatus==='loading'?'loading…':'load model'}</button><span id="webllmMsg" style="margin-left:10px;font-size:11px;color:var(--cream-muted)"></span></div>
+  `;
+  $('#loadWebllm').addEventListener('click', loadWebLLM);
+}
+window.toggleProvider = async function(id) { state.providerConfig[id].enabled = !state.providerConfig[id].enabled; await persistProviderConfig(); render(); };
+window.setProviderKey = async function(id, key) { state.providerConfig[id].key = key; await persistProviderConfig(); };
+async function loadWebLLM() {
+  state.webllmStatus = 'loading'; $('#webllmMsg').textContent = 'loading…';
+  try {
+    const { CreateMLCEngine } = await import('https://esm.run/@mlc-ai/web-llm');
+    state.webllmEngine = await CreateMLCEngine('Llama-3.2-3B-Instruct-q4f16_1-MLC', { initProgressCallback: r => { const m=$('#webllmMsg'); if(m) m.textContent = r.text||'loading…'; } });
+    state.webllmStatus = 'ready'; $('#webllmMsg').textContent = '✓ loaded';
+  } catch (e) { state.webllmStatus = 'unloaded'; $('#webllmMsg').textContent = '✗ ' + e.message; }
+}
+
+function renderPackager(main) {
+  if (!state.pkgDraft) state.pkgDraft = JSON.parse(JSON.stringify(SEED));
+  main.innerHTML = `
+    <div class="section-h"><h2>Fork Seed</h2></div>
+    <div class="card">
+      <p style="font-size:12px;color:var(--cream-dim);margin-bottom:10px">Mutate the SEED below, fork into a new HTML.</p>
+      <textarea id="pkgJson" rows="20" style="font-family:var(--mono);font-size:11px">${esc(JSON.stringify(state.pkgDraft, null, 2))}</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px"><button class="btn brass" id="pkgGo">Fork into HTML →</button></div>
+    </div>
+  `;
+  $('#pkgGo').addEventListener('click', forkSeed);
+}
+async function forkSeed() {
+  let draft; try { draft = JSON.parse($('#pkgJson').value); } catch(e) { toast('invalid JSON', true); return; }
+  const html = await (await fetch(location.href, {cache:'reload'})).text();
+  const start = html.indexOf('const SEED_DEFAULT = {');
+  let depth=0, end=-1;
+  for (let i = start + 'const SEED_DEFAULT = '.length; i < html.length; i++) {
+    if (html[i] === '{') depth++; else if (html[i] === '}') { depth--; if (depth === 0) { end=i+1; break; } }
+  }
+  while (end < html.length && html[end] === ' ') end++;
+  if (html[end] === ';') end++;
+  const newHtml = html.slice(0,start) + 'const SEED_DEFAULT = ' + jsLiteral(draft) + ';' + html.slice(end);
+  const blob = new Blob([newHtml], { type:'text/html' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'fallseed-village-fork.html'; a.click();
+  toast('forked · saved');
+}
+
+async function renderInspect(main) {
+  const m = (await idbGetAll('members')).length;
+  const p = (await idbGetAll('proposals')).length;
+  const v = (await idbGetAll('votes')).length;
+  const l = (await idbGetAll('ledger')).length;
+  const b = (await idbGetAll('bundles')).length;
+  main.innerHTML = `
+    <div class="section-h"><h2>Inspect</h2></div>
+    <div class="inspect-grid">
+      <div class="inspect-card"><div class="num">${SEED.manifest.prime}</div><div class="lbl">Seed prime</div></div>
+      <div class="inspect-card"><div class="num">L${SEED.manifest.level}</div><div class="lbl">Seed level</div></div>
+      <div class="inspect-card"><div class="num">${Object.keys(SEED.institutions).length}</div><div class="lbl">Institutions loaded</div></div>
+      <div class="inspect-card"><div class="num">${m}</div><div class="lbl">Members</div></div>
+      <div class="inspect-card"><div class="num">${p}</div><div class="lbl">Proposals</div></div>
+      <div class="inspect-card"><div class="num">${v}</div><div class="lbl">Votes</div></div>
+      <div class="inspect-card"><div class="num">${l}</div><div class="lbl">Ledger entries</div></div>
+      <div class="inspect-card"><div class="num">${b}</div><div class="lbl">Bundles imported</div></div>
+    </div>
+    <div class="card" style="margin-top:18px"><h3>About this seed</h3>
+      <p style="font-size:12px;color:var(--cream-dim);margin-bottom:8px">Level-4 institution-tier seed in the FallSeed family. Root seed (parent: null). Implements the Fork Seed primitive — see the <a href="https://www.ai-nativesolutions.com/spec.html" target="_blank" rel="noopener" style="color:var(--brass)">public spec</a>.</p>
+      <p style="font-size:12px;color:var(--cream-dim);margin-bottom:8px"><strong style="color:var(--brass)">Socket-VIII note:</strong> ${esc(SEED.manifest.socketNote || '')}</p>
+      <p style="font-size:11px;color:var(--cream-muted);font-family:var(--mono);letter-spacing:.06em">level <span style="color:var(--brass)">4</span> · parent <span style="color:var(--brass)">null</span> · MIT</p>
+    </div>
+    <div class="card"><h3>Audit chain head</h3><div style="font-family:var(--mono);font-size:11px;color:var(--brass);word-break:break-all">${esc(chainHead)}</div></div>
+  `;
+}
+
+function renderSettings(main) {
+  main.innerHTML = `
+    <div class="section-h"><h2>Settings</h2></div>
+    <div class="card"><h3>Export / import everything</h3><div style="display:flex;gap:8px"><button class="btn brass sm" onclick="exportAll()">⬇ export JSON</button><button class="btn sm" onclick="document.getElementById('impFile').click()">⬆ import JSON</button><input id="impFile" type="file" accept=".json" style="display:none" onchange="importAll(this.files[0])"></div></div>
+    <div class="card"><h3>Wipe</h3><button class="btn danger sm" onclick="wipeAll()">⚠ wipe everything (keeps identity)</button></div>
+  `;
+}
+window.exportAll = async function() {
+  const b = { seed:SEED, config:{providerConfig:state.providerConfig, currentInstitution:state.currentInstitution, chainHead}, identity:state.identity, members:await idbGetAll('members'), proposals:await idbGetAll('proposals'), votes:await idbGetAll('votes'), ledger:await idbGetAll('ledger'), bundles:await idbGetAll('bundles'), charter:await idbGet('charter','current'), exportedAt:now() };
+  const blob = new Blob([JSON.stringify(b,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='fallseed-village-export-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  toast('exported');
+};
+window.importAll = async function(file) {
+  if (!file) return;
+  try {
+    const b = JSON.parse(await file.text());
+    if (b.config) { state.providerConfig = b.config.providerConfig||{}; state.currentInstitution = b.config.currentInstitution||'village'; chainHead = b.config.chainHead||chainHead; await persistProviderConfig(); await persistInstitution(); await idbPut('config', chainHead, 'chainHead'); }
+    if (b.identity) { state.identity = b.identity; await persistIdentity(); }
+    for (const st of ['members','proposals','votes','ledger','bundles']) { await idbClear(st); for (const r of (b[st]||[])) await idbPut(st, r); }
+    if (b.charter) await idbPut('charter', b.charter, 'current');
+    toast('imported'); render();
+  } catch (e) { toast('import failed: '+e.message, true); }
+};
+window.wipeAll = async function() {
+  if (!confirm('Wipe every record? Identity preserved.')) return;
+  for (const st of ['members','proposals','votes','ledger','bundles']) await idbClear(st);
+  await idbClear('charter');
+  chainHead = '0'.repeat(64); await idbPut('config', chainHead, 'chainHead');
+  toast('wiped'); render();
+};
+
+function renderInstall(main) {
+  main.innerHTML = `
+    <div class="section-h"><h2>Install</h2></div>
+    <div class="card"><h3>Save as HTML</h3><p style="font-size:12px;color:var(--cream-dim)">Right-click → Save As. Keeps this exact version. Works file://.</p></div>
+    <div class="card"><h3>Install as PWA</h3><p style="font-size:12px;color:var(--cream-dim)">Chrome / Edge: ⊕ in address bar. iOS/Android: Share → Add to Home Screen.</p></div>
+  `;
+}
+
+async function boot() {
+  await openDB(); await loadAll(); initMesh(); await autoDetectLocal();
+  renderNav();
+  render();
+  const idEl = $('#headerIdentity');
+  if (idEl) idEl.textContent = state.identity ? ('◊ ' + state.identity.displayName + ' · ' + state.identity.id.slice(-8)) : '◊ no identity';
+}
+boot().catch(e => { console.error(e); document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;bottom:20px;left:20px;background:#8b1a1a;color:#fff;padding:14px 18px;border-radius:4px;z-index:9999;font-family:monospace">boot failed: '+e.message+'</div>'); });
+
+</script>
+</body>
+</html>
