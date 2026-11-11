@@ -37,7 +37,7 @@ Welcome · Institution · Members · Charter · Proposals · My votes · Ledger 
 
 ## Cosmology
 
-Prime **1277**, spine-clean mod 127 = 7 (spine prime itself). Seed level **4**. Mesh channel **`fall-village`**. Root seed (parent: null). Seal **◊·κ=1**.
+Prime **1277**, spine-clean mod 127 = 7 (spine prime itself). Seed level **4**. Mesh channel **`fall-village`**. Root seed (parent: null). Seal ****.
 
 ## Socket VIII note
 
